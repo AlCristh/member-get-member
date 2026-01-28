@@ -3,6 +3,7 @@ package com.alejandro.membergetmember.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.alejandro.membergetmember.domain.enums.ReferralStatus;
 
 import java.time.LocalDateTime;
 
@@ -32,5 +33,13 @@ public class Referral {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = ReferralStatus.CADASTRADO;
+        }
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReferralStatus status;
+
 }

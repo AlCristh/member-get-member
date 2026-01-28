@@ -7,8 +7,14 @@ public class ReferralResponse {
     private Long id;
     private Long referrerId;
     private Long referredId;
+
+    private String referredName;
+    private String referredEmail;
+
+    private String status;
     private LocalDateTime createdAt;
 
+    // getters e setters
     public Long getId() {
         return id;
     }
@@ -31,6 +37,30 @@ public class ReferralResponse {
 
     public void setReferredId(Long referredId) {
         this.referredId = referredId;
+    }
+
+    public String getReferredName() {
+        return referredName;
+    }
+
+    public void setReferredName(String referredName) {
+        this.referredName = referredName;
+    }
+
+    public String getReferredEmail() {
+        return referredEmail;
+    }
+
+    public void setReferredEmail(String referredEmail) {
+        this.referredEmail = referredEmail;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

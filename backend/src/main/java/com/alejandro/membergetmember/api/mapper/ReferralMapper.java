@@ -10,7 +10,11 @@ public class ReferralMapper {
         response.setId(referral.getId());
         response.setReferrerId(referral.getReferrer().getId());
         response.setReferredId(referral.getReferred().getId());
+        response.setReferredName(referral.getReferred().getName());
+        response.setReferredEmail(referral.getReferred().getEmail());
+        response.setStatus(referral.getStatus().name());
         response.setCreatedAt(referral.getCreatedAt());
+
         return response;
     }
 }

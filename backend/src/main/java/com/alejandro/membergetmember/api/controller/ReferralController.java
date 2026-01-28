@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/referrals")
 public class ReferralController {
@@ -29,5 +31,10 @@ public class ReferralController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReferralMapper.toResponse(referral));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ReferralResponse>> findAll() {
+        return ResponseEntity.ok(referralService.findAll());
     }
 }

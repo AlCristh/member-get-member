@@ -1,5 +1,7 @@
 package com.alejandro.membergetmember.service.impl;
 
+import com.alejandro.membergetmember.api.dto.referral.ReferralResponse;
+import com.alejandro.membergetmember.api.mapper.ReferralMapper;
 import com.alejandro.membergetmember.domain.entity.Member;
 import com.alejandro.membergetmember.domain.entity.Referral;
 import com.alejandro.membergetmember.repository.MemberRepository;
@@ -7,41 +9,41 @@ import com.alejandro.membergetmember.repository.ReferralRepository;
 import com.alejandro.membergetmember.service.ReferralService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ReferralServiceImpl implements ReferralService {
 
-    private final MemberRepository memberRepository;
     private final ReferralRepository referralRepository;
+    private final MemberRepository memberRepository;
 
-    public ReferralServiceImpl(MemberRepository memberRepository,
-            ReferralRepository referralRepository) {
-        this.memberRepository = memberRepository;
+    public ReferralServiceImpl(
+            ReferralRepository referralRepository,
+            MemberRepository memberRepository) {
         this.referralRepository = referralRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public Referral createReferral(String referralCode, Long referredMemberId) {
-
         Member referrer = memberRepository.findByReferralCode(referralCode)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid referral code"));
 
         Member referred = memberRepository.findById(referredMemberId)
                 .orElseThrow(() -> new IllegalArgumentException("Referred member not found"));
 
-        if (referrer.getId().equals(referred.getId())) {
-            throw new IllegalArgumentException("Self-referral is not allowed");
-        }
-
-        if (referralRepository.existsByReferred(referred)) {
-            throw new IllegalArgumentException("Member has already been referred");
-        }
-
         Referral referral = new Referral();
         referral.setReferrer(referrer);
         referral.setReferred(referred);
 
-  
-
         return referralRepository.save(referral);
+    }
+
+    @Override
+    public List<ReferralResponse> findAll() {
+        return referralRepository.findAll()
+                .stream()
+                .map(ReferralMapper::toResponse)
+                .toList();
     }
 }
