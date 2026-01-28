@@ -1,77 +1,82 @@
-# member-get-member - Backend
+Member Get Member API 🚀
 
-API backend para um programa de indicação ("Member Get Member"), onde usuários podem se cadastrar, gerar códigos de indicação e indicar novos membros.
+API REST desenvolvida em Java + Spring Boot para gerenciar um programa de indicação (member get member), onde usuários podem indicar outros usuários através de um código único e regras claras de negócio.
 
----
+Este projeto foi desenvolvido com foco em boas práticas, arquitetura limpa e clareza de regras, simulando um cenário real de mercado.
 
-## 📌 Visão Geral
+🧠 Visão Geral do Negócio
 
-Este projeto tem como objetivo implementar um sistema de **indicação de usuários**, onde:
+Usuários (Member) podem se cadastrar na plataforma
 
-- Cada membro possui um **código de indicação único**
-- Novos membros podem se cadastrar usando o código de outro membro
-- O sistema é preparado para evolução futura, como **créditos, recompensas e relatórios**
+Cada usuário recebe um código único de indicação (referralCode)
 
-O foco do projeto é demonstrar:
-- Boas práticas de arquitetura
-- Organização em camadas
-- Clareza nas regras de negócio
-- Código limpo e extensível
+Um usuário pode indicar outro usuário
 
----
+A indicação gera um vínculo persistido (Referral)
 
-## 🧠 Regras de Negócio (implementadas até o momento)
+Regras de negócio garantem a integridade do processo
 
-### ✔ Cadastro de Membro
-- O sistema permite cadastrar membros com:
-  - Nome
-  - E-mail
-  - Código de indicação (opcional)
+📜 Regras de Negócio Implementadas
+Cadastro de Membro
 
-### ✔ Validação de E-mail
-- Não é permitido cadastrar dois membros com o mesmo e-mail
+✅ E-mail deve ser único
 
-### ✔ Código de Indicação
-- Cada membro possui um código de indicação único
-- O código é gerado automaticamente no momento do cadastro
-- O usuário não pode escolher manualmente seu código
+✅ Código de indicação é gerado automaticamente
 
-### ✔ Persistência
-- Os dados são armazenados em banco de dados PostgreSQL
+✅ Data de criação registrada automaticamente
 
-### ⚠ Regras em evolução
-As regras abaixo **ainda não estão implementadas**, mas fazem parte do roadmap do projeto:
-- Validação do código de indicação informado
-- Relação entre quem indicou e quem foi indicado
-- Sistema de créditos ou recompensas
-- Limites de indicação
-- Relatórios de indicações
+Indicações (Referral)
 
----
+✅ Código de indicação precisa existir
 
-## 🏗 Arquitetura do Projeto
+✅ Auto-indicação não é permitida
+
+✅ Um membro só pode ser indicado uma vez
+
+✅ Regras validadas na camada de serviço
+
+Tratamento de Erros
+
+✅ Erros retornam HTTP 400
+
+✅ Resposta padronizada em JSON
+
+✅ Mensagens claras de negócio
+
+🏗️ Arquitetura
 
 O projeto segue uma arquitetura em camadas:
 
-controller → service → repository → database
-            ↓
-           dto / mapper
+Controller → Service → Repository → Database
 
-Estrutura de pacotes:
 
-com.alejandro.membergetmember
-├── api
-│   ├── controller
-│   └── dto
-│       └── member
-├── domain
-│   └── entity
-├── repository
-├── service
-│   └── impl
-└── MemberGetMemberBackendApplication.java
+Separação clara de responsabilidades:
 
-🛠 Tecnologias Utilizadas
+Controller: entrada/saída HTTP
+
+Service: regras de negócio
+
+Repository: acesso a dados
+
+DTOs: contratos de entrada e saída
+
+Mapper: conversão Entity ↔ DTO
+
+Handler: tratamento global de exceções
+
+🔐 Segurança
+
+API configurada como stateless
+
+formLogin e httpBasic desativados
+
+Endpoints públicos liberados apenas para facilitar testes
+
+Estrutura preparada para futura evolução com JWT
+
+⚠️ A configuração atual é intencional para ambiente de desenvolvimento e avaliação técnica.
+
+🛠️ Tecnologias Utilizadas
 
 Java 17
 
@@ -87,45 +92,123 @@ Maven
 
 Lombok
 
-▶ Como Rodar o Projeto Localmente
-Pré-requisitos:
+Thunder Client (testes)
+
+📦 Endpoints Disponíveis
+🔹 Criar Membro
+POST /api/members
+
+
+Body:
+
+{
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "referredByCode": null
+}
+
+
+Resposta:
+
+{
+  "id": 1,
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "referralCode": "7BFC1790",
+  "createdAt": "2026-01-28T15:30:00"
+}
+
+🔹 Listar Membros
+GET /api/members
+
+
+Resposta:
+
+[
+  {
+    "id": 1,
+    "name": "Alejandro",
+    "email": "alejandro@email.com",
+    "referralCode": "7BFC1790"
+  }
+]
+
+🔹 Criar Indicação (Referral)
+POST /api/referrals
+
+
+Body:
+
+{
+  "referralCode": "7BFC1790",
+  "referredMemberId": 3
+}
+
+
+Resposta:
+
+{
+  "id": 1,
+  "referrerId": 1,
+  "referredId": 3,
+  "createdAt": "2026-01-28T16:10:00"
+}
+
+❌ Exemplo de Erro (Regra de Negócio)
+Auto-indicação ou indicação duplicada
+
+Status: 400 Bad Request
+
+{
+  "message": "Self-referral is not allowed",
+  "status": 400,
+  "timestamp": "2026-01-28T16:12:00"
+}
+
+🚀 Como Executar o Projeto
+Pré-requisitos
 
 Java 17+
 
-Maven
-
 PostgreSQL
 
-1️⃣ Clone o repositório
-git clone <url-do-repositorio>
-cd member-get-member/backend
+Maven
 
-2️⃣ Configure o banco de dados
+Configuração do banco
 
-No arquivo application.properties:
+Criar banco no PostgreSQL:
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/member_get_member
+CREATE DATABASE membergetmember;
+
+
+Configurar application.properties:
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/membergetmember
 spring.datasource.username=postgres
 spring.datasource.password=postgres
-
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
 
-3️⃣ Rode a aplicação
+Executar
 mvn spring-boot:run
 
 
-A aplicação estará disponível em:
+A aplicação sobe em:
 
 http://localhost:8080
 
-🔐 Segurança
+📈 Próximas Evoluções Planejadas
 
-Atualmente o projeto utiliza Spring Security padrão, exigindo autenticação para acessar os endpoints.
+Autenticação com JWT
 
-⚠ Configuração temporária apenas para ambiente de desenvolvimento.
+Créditos por indicação
+
+Listagem de referrals
+
+Testes unitários
+
+Paginação e filtros
 
 👤 Autor
 
-Desenvolvido por Alejandro Magalhães
-Projeto com fins educacionais e demonstrativos.
+Alejandro Magalhães
+Projeto desenvolvido como case técnico e portfólio profissional.
