@@ -6,6 +6,7 @@ import com.alejandro.membergetmember.api.mapper.MemberMapper;
 import com.alejandro.membergetmember.domain.entity.Member;
 import com.alejandro.membergetmember.repository.MemberRepository;
 import com.alejandro.membergetmember.service.MemberService;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -47,4 +48,13 @@ public class MemberServiceImpl implements MemberService {
                 .substring(0, 8)
                 .toUpperCase();
     }
+
+    @Override
+    public List<MemberResponse> findAll() {
+        return memberRepository.findAll()
+                .stream()
+                .map(MemberMapper::toResponse)
+                .toList();
+    }
+
 }
