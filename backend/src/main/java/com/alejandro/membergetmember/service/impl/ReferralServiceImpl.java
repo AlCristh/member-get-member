@@ -4,6 +4,7 @@ import com.alejandro.membergetmember.api.dto.referral.ReferralResponse;
 import com.alejandro.membergetmember.api.mapper.ReferralMapper;
 import com.alejandro.membergetmember.domain.entity.Member;
 import com.alejandro.membergetmember.domain.entity.Referral;
+import com.alejandro.membergetmember.domain.enums.ReferralStatus;
 import com.alejandro.membergetmember.repository.MemberRepository;
 import com.alejandro.membergetmember.repository.ReferralRepository;
 import com.alejandro.membergetmember.service.ReferralService;
@@ -35,6 +36,7 @@ public class ReferralServiceImpl implements ReferralService {
         Referral referral = new Referral();
         referral.setReferrer(referrer);
         referral.setReferred(referred);
+        referral.setStatus(ReferralStatus.CONVIDADO);
 
         return referralRepository.save(referral);
     }

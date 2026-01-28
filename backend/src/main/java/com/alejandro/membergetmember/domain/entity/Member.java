@@ -33,8 +33,13 @@ public class Member {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer credits = 0;
+
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (this.credits == null)
+            this.credits = 0;
     }
 }
