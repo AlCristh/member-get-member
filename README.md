@@ -1,214 +1,254 @@
-Member Get Member API 🚀
+Member Get Member – Backend API
 
-API REST desenvolvida em Java + Spring Boot para gerenciar um programa de indicação (member get member), onde usuários podem indicar outros usuários através de um código único e regras claras de negócio.
+API REST desenvolvida em Java 17 + Spring Boot para gerenciar um programa de indicação (Member Get Member), onde usuários podem se cadastrar, indicar outros usuários e acumular créditos com base nas indicações.
 
-Este projeto foi desenvolvido com foco em boas práticas, arquitetura limpa e clareza de regras, simulando um cenário real de mercado.
+Este projeto foi desenvolvido como case técnico Fullstack, com foco inicial no backend, seguindo boas práticas de arquitetura, validação, segurança e organização de código.
 
-🧠 Visão Geral do Negócio
-
-Usuários (Member) podem se cadastrar na plataforma
-
-Cada usuário recebe um código único de indicação (referralCode)
-
-Um usuário pode indicar outro usuário
-
-A indicação gera um vínculo persistido (Referral)
-
-Regras de negócio garantem a integridade do processo
-
-📜 Regras de Negócio Implementadas
-Cadastro de Membro
-
-✅ E-mail deve ser único
-
-✅ Código de indicação é gerado automaticamente
-
-✅ Data de criação registrada automaticamente
-
-Indicações (Referral)
-
-✅ Código de indicação precisa existir
-
-✅ Auto-indicação não é permitida
-
-✅ Um membro só pode ser indicado uma vez
-
-✅ Regras validadas na camada de serviço
-
-Tratamento de Erros
-
-✅ Erros retornam HTTP 400
-
-✅ Resposta padronizada em JSON
-
-✅ Mensagens claras de negócio
-
-🏗️ Arquitetura
-
-O projeto segue uma arquitetura em camadas:
-
-Controller → Service → Repository → Database
-
-
-Separação clara de responsabilidades:
-
-Controller: entrada/saída HTTP
-
-Service: regras de negócio
-
-Repository: acesso a dados
-
-DTOs: contratos de entrada e saída
-
-Mapper: conversão Entity ↔ DTO
-
-Handler: tratamento global de exceções
-
-🔐 Segurança
-
-API configurada como stateless
-
-formLogin e httpBasic desativados
-
-Endpoints públicos liberados apenas para facilitar testes
-
-Estrutura preparada para futura evolução com JWT
-
-⚠️ A configuração atual é intencional para ambiente de desenvolvimento e avaliação técnica.
-
-🛠️ Tecnologias Utilizadas
+🚀 Tecnologias Utilizadas
 
 Java 17
 
 Spring Boot 4
 
+Spring Web
+
 Spring Data JPA
 
-Spring Security
+Spring Security (API stateless)
 
 PostgreSQL
 
-Maven
+Hibernate
 
 Lombok
 
-Thunder Client (testes)
+Maven
 
-📦 Endpoints Disponíveis
-🔹 Criar Membro
+📐 Arquitetura
+
+O projeto segue uma arquitetura em camadas:
+
+api
+ ├── controller
+ ├── dto
+ └── mapper
+domain
+ ├── entity
+ └── enums
+repository
+service
+ ├── interface
+ └── impl
+config
+
+Camadas:
+
+Controller: expõe os endpoints REST
+
+Service: regras de negócio
+
+Repository: acesso a dados via JPA
+
+DTOs: objetos de entrada e saída
+
+Mapper: conversão entre entidade ↔ DTO
+
+🔐 Segurança
+
+API configurada como STATELESS
+
+CSRF desabilitado (API REST)
+
+Form login e HTTP Basic desativados
+
+Endpoints liberados explicitamente via SecurityConfig
+
+Preparada para futura autenticação via JWT no frontend
+
+⚠️ Este backend não serve páginas HTML.
+Toda interação é feita via endpoints REST (Postman/Thunder/Frontend).
+
+❤️ Health Check
+
+Verificação simples de status da API:
+
+GET /health
+
+
+Resposta:
+
+OK!!
+
+🧩 Entidades Principais
+Member
+
+Representa um usuário do sistema.
+
+Campos principais:
+
+id
+
+name
+
+email
+
+referralCode (gerado automaticamente)
+
+referredByCode
+
+credits
+
+createdAt
+
+Referral
+
+Representa uma indicação entre membros.
+
+Campos principais:
+
+id
+
+referrer
+
+referred
+
+status (ENUM)
+
+createdAt
+
+Status possíveis:
+
+CADASTRADO
+
+(pronto para evolução futura)
+
+📌 Regras de Negócio Implementadas
+
+✅ Não permite cadastro de membros com e-mail duplicado
+
+✅ Código de indicação é gerado automaticamente
+
+✅ Um membro não pode se autoindicar
+
+✅ Um membro só pode ser indicado uma única vez
+
+✅ Valida código de indicação inexistente
+
+✅ Retorno de erros padronizado em JSON
+
+✅ Ranking de membros por créditos
+
+✅ Ordenação estável no ranking
+
+🔗 Endpoints Disponíveis
+Members
+Criar membro
 POST /api/members
 
 
-Body:
+Body (JSON):
 
 {
   "name": "João Silva",
   "email": "joao@email.com",
-  "referredByCode": null
+  "referredByCode": "ABC12345"
 }
 
-
-Resposta:
-
-{
-  "id": 1,
-  "name": "João Silva",
-  "email": "joao@email.com",
-  "referralCode": "7BFC1790",
-  "createdAt": "2026-01-28T15:30:00"
-}
-
-🔹 Listar Membros
+Listar membros
 GET /api/members
 
+Ranking de membros
+GET /api/members/ranking
 
-Resposta:
 
-[
-  {
-    "id": 1,
-    "name": "Alejandro",
-    "email": "alejandro@email.com",
-    "referralCode": "7BFC1790"
-  }
-]
+Ordenado por:
 
-🔹 Criar Indicação (Referral)
+credits (DESC)
+
+createdAt (ASC)
+
+Referrals
+Criar indicação
 POST /api/referrals
 
 
-Body:
+Body (JSON):
 
 {
-  "referralCode": "7BFC1790",
-  "referredMemberId": 3
+  "referralCode": "ABC12345",
+  "referredMemberId": 2
 }
 
+Listar indicações
+GET /api/referrals
 
-Resposta:
+⚠️ Tratamento de Erros
+
+Erros retornam sempre em formato JSON, com status HTTP adequado.
+
+Exemplo:
 
 {
-  "id": 1,
-  "referrerId": 1,
-  "referredId": 3,
-  "createdAt": "2026-01-28T16:10:00"
+  "message": "E-mail já cadastrado"
 }
 
-❌ Exemplo de Erro (Regra de Negócio)
-Auto-indicação ou indicação duplicada
-
-Status: 400 Bad Request
-
-{
-  "message": "Self-referral is not allowed",
-  "status": 400,
-  "timestamp": "2026-01-28T16:12:00"
-}
-
-🚀 Como Executar o Projeto
-Pré-requisitos
-
-Java 17+
+🗄️ Banco de Dados
 
 PostgreSQL
 
-Maven
+Configuração via application.properties
 
-Configuração do banco
+Hibernate gerencia criação das tabelas automaticamente
 
-Criar banco no PostgreSQL:
-
-CREATE DATABASE membergetmember;
-
-
-Configurar application.properties:
+Exemplo:
 
 spring.datasource.url=jdbc:postgresql://localhost:5432/membergetmember
 spring.datasource.username=postgres
 spring.datasource.password=postgres
 spring.jpa.hibernate.ddl-auto=update
 
-Executar
+▶️ Como Executar o Projeto
+Pré-requisitos:
+
+Java 17
+
+Maven
+
+PostgreSQL rodando
+
+Passos:
+git clone https://github.com/AlCristh/member-get-member.git
+cd member-get-member/backend
 mvn spring-boot:run
 
 
-A aplicação sobe em:
+API disponível em:
 
 http://localhost:8080
 
-📈 Próximas Evoluções Planejadas
+🧪 Testes
 
-Autenticação com JWT
+Os endpoints podem ser testados via:
 
-Créditos por indicação
+Thunder Client
 
-Listagem de referrals
+Postman
 
-Testes unitários
+Insomnia
 
-Paginação e filtros
+🧭 Próximos Passos (Planejado)
+
+🔜 Frontend em React
+
+🔜 Integração via Axios
+
+🔜 Autenticação com JWT
+
+🔜 UI para ranking e indicações
+
+🔜 Validações adicionais no frontend
 
 👤 Autor
 
-Alejandro Magalhães
-Projeto desenvolvido como case técnico e portfólio profissional.
+Desenvolvido por Alejandro Magalhães
+Projeto criado como case técnico Fullstack Júnior

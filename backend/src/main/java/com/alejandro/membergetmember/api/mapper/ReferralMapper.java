@@ -14,7 +14,6 @@ public class ReferralMapper {
         response.setReferredEmail(referral.getReferred().getEmail());
         response.setStatus(referral.getStatus().name());
         response.setCreatedAt(referral.getCreatedAt());
-
         return response;
     }
 }
