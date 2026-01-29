@@ -9,4 +9,7 @@ public interface MemberService {
     MemberResponse create(MemberCreateRequest request);
 
     List<MemberResponse> findAll();
+
+    List<MemberResponse> getRanking();
+
 }

@@ -30,4 +30,10 @@ public class MemberController {
     public ResponseEntity<List<MemberResponse>> findAll() {
         return ResponseEntity.ok(memberService.findAll());
     }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<List<MemberResponse>> ranking() {
+        return ResponseEntity.ok(memberService.getRanking());
+    }
+
 }

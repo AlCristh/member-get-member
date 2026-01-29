@@ -1,15 +1,14 @@
 package com.alejandro.membergetmember.service.impl;
 
-import  com.alejandro.membergetmember.api.dto.member.MemberCreateRequest;
-import  com.alejandro.membergetmember.api.dto.member.MemberResponse;
+import com.alejandro.membergetmember.api.dto.member.MemberCreateRequest;
+import com.alejandro.membergetmember.api.dto.member.MemberResponse;
 import com.alejandro.membergetmember.api.mapper.MemberMapper;
 import com.alejandro.membergetmember.domain.entity.Member;
 import com.alejandro.membergetmember.repository.MemberRepository;
 import com.alejandro.membergetmember.service.MemberService;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -57,4 +56,11 @@ public class MemberServiceImpl implements MemberService {
                 .toList();
     }
 
+    @Override
+    public List<MemberResponse> getRanking() {
+        return memberRepository.findAllByOrderByCreditsDescCreatedAtAsc()
+                .stream()
+                .map(MemberMapper::toResponse)
+                .toList();
+    }
 }
