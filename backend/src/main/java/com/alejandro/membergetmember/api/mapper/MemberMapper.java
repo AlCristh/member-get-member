@@ -15,11 +15,11 @@ public class MemberMapper {
     }
 
     public static MemberResponse toResponse(Member member) {
-     return new MemberResponse(
-            member.getId(),
-            member.getName(),
-            member.getEmail(),
-            member.getReferralCode(),
-            member.getCredits()
+        return new MemberResponse(
+                member.getId(),
+                member.getName(),
+                member.getEmail(),
+                member.getReferralCode(),
+                member.getCredits());
     }
 }
