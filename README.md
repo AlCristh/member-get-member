@@ -295,7 +295,7 @@ A API ficará disponível em:
 
 http://localhost:8080
 
-Front-end
+## Front-end
 
 Na pasta frontend:
 
@@ -307,7 +307,7 @@ A aplicação ficará disponível em:
 
 http://localhost:5173
 
-🔐 Autenticação
+## 🔐 Autenticação
 
 A autenticação é feita via JWT
 
@@ -317,7 +317,7 @@ Todas as rotas protegidas exigem o header:
 
 Authorization: Bearer <token>
 
-📡 Endpoints Principais
+## 📡 Endpoints Principais
 Autenticação
 
 POST /api/auth/register
@@ -348,7 +348,7 @@ Expiração de convites antigos
 
 Testes automatizados (unitários e integração)
 
-📌 Considerações Finais
+## 📌 Considerações Finais
 
 Este projeto foi desenvolvido com foco em:
 
