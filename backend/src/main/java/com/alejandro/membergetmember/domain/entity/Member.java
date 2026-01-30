@@ -24,6 +24,9 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     @Column(name = "referral_code", nullable = false, unique = true)
     private String referralCode;
 
@@ -33,13 +36,12 @@ public class Member {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
     @Builder.Default
+    @Column(nullable = false)
     private Integer credits = 0;
 
+    @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.credits == null)
-            this.credits = 0;
     }
 }

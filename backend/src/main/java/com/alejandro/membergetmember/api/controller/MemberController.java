@@ -1,10 +1,7 @@
 package com.alejandro.membergetmember.api.controller;
 
-import com.alejandro.membergetmember.api.dto.member.MemberCreateRequest;
 import com.alejandro.membergetmember.api.dto.member.MemberResponse;
 import com.alejandro.membergetmember.service.MemberService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +17,6 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @PostMapping
-    public ResponseEntity<MemberResponse> create(@RequestBody @Valid MemberCreateRequest request) {
-        MemberResponse response = memberService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping
     public ResponseEntity<List<MemberResponse>> findAll() {
         return ResponseEntity.ok(memberService.findAll());
@@ -35,5 +26,4 @@ public class MemberController {
     public ResponseEntity<List<MemberResponse>> ranking() {
         return ResponseEntity.ok(memberService.getRanking());
     }
-
 }
