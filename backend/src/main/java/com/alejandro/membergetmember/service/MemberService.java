@@ -8,4 +8,6 @@ public interface MemberService {
     List<MemberResponse> findAll();
 
     List<MemberResponse> getRanking();
+
+    MemberResponse getMe(String email);
 }

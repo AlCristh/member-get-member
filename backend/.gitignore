@@ -31,3 +31,30 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# ===== Java / Spring =====
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+
+# IntelliJ / Eclipse
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# ===== Node / React =====
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ===== Env / secrets =====
+.env
+.env.*
+backend/src/main/resources/application-local.properties
+
+# OS
+.DS_Store
+Thumbs.db

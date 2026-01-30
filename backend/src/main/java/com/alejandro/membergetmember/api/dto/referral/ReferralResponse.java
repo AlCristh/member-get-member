@@ -5,16 +5,25 @@ import java.time.LocalDateTime;
 public class ReferralResponse {
 
     private Long id;
+
     private Long referrerId;
     private Long referredId;
+
+    private String invitedEmail;
 
     private String referredName;
     private String referredEmail;
 
     private String status;
-    private LocalDateTime createdAt;
 
-    // getters e setters
+    private LocalDateTime createdAt;
+    private LocalDateTime invitedAt;
+    private LocalDateTime registeredAt;
+    private LocalDateTime creditedAt;
+
+    private Integer resendCount;
+    private LocalDateTime lastResentAt;
+
     public Long getId() {
         return id;
     }
@@ -37,6 +46,14 @@ public class ReferralResponse {
 
     public void setReferredId(Long referredId) {
         this.referredId = referredId;
+    }
+
+    public String getInvitedEmail() {
+        return invitedEmail;
+    }
+
+    public void setInvitedEmail(String invitedEmail) {
+        this.invitedEmail = invitedEmail;
     }
 
     public String getReferredName() {
@@ -69,5 +86,45 @@ public class ReferralResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getInvitedAt() {
+        return invitedAt;
+    }
+
+    public void setInvitedAt(LocalDateTime invitedAt) {
+        this.invitedAt = invitedAt;
+    }
+
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
+    }
+
+    public LocalDateTime getCreditedAt() {
+        return creditedAt;
+    }
+
+    public void setCreditedAt(LocalDateTime creditedAt) {
+        this.creditedAt = creditedAt;
+    }
+
+    public Integer getResendCount() {
+        return resendCount;
+    }
+
+    public void setResendCount(Integer resendCount) {
+        this.resendCount = resendCount;
+    }
+
+    public LocalDateTime getLastResentAt() {
+        return lastResentAt;
+    }
+
+    public void setLastResentAt(LocalDateTime lastResentAt) {
+        this.lastResentAt = lastResentAt;
     }
 }

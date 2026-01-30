@@ -1,6 +1,7 @@
 package com.alejandro.membergetmember.api.controller;
 
 import com.alejandro.membergetmember.api.dto.member.MemberResponse;
+import com.alejandro.membergetmember.security.SecurityUtils;
 import com.alejandro.membergetmember.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    // só pra admin
     @GetMapping
     public ResponseEntity<List<MemberResponse>> findAll() {
         return ResponseEntity.ok(memberService.findAll());
@@ -25,5 +27,12 @@ public class MemberController {
     @GetMapping("/ranking")
     public ResponseEntity<List<MemberResponse>> ranking() {
         return ResponseEntity.ok(memberService.getRanking());
+    }
+
+    //  Dashboard deve usa isso:
+    @GetMapping("/me")
+    public ResponseEntity<MemberResponse> me() {
+        String email = SecurityUtils.getCurrentUserEmail();
+        return ResponseEntity.ok(memberService.getMe(email));
     }
 }

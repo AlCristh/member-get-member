@@ -3,6 +3,7 @@ package com.alejandro.membergetmember.config;
 import com.alejandro.membergetmember.security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,16 +25,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // usa o CorsConfigurationSource do CorsConfig.java
+                .cors(cors -> {
+                })
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(fl -> fl.disable())
+                .httpBasic(hb -> hb.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // libera preflight do CORS
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // público
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/members/**").permitAll() // depois a gente restringe quando o front
-                                                                        // estiver pronto
-                        .requestMatchers("/api/referrals/**").permitAll() // idem
+
+                        // o resto exige token (ajuste se quiser liberar ranking/members publicamente)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -46,7 +53,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+        return cfg.getAuthenticationManager();
     }
 }
