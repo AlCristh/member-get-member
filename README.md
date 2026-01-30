@@ -283,9 +283,13 @@ O backend utiliza variáveis de ambiente(locais) para dados sensíveis.
 abra o Windows / PowerShell na pasta do projeto :
 
 digite:
+
 cd backend
+
 $env:DB_USER="postgres"
+
 $env:DB_PASSWORD="sua senha aqui"
+
 $env:JWT_SECRET="member-get-member-jwt-secret-2026"
 
 .\mvnw spring-boot:run ENTER
