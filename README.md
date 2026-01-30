@@ -336,7 +336,7 @@ POST /api/referrals/{id}/resend → reenvio de convite
 
 GET /api/referrals/my → indicações do usuário logado
 
-📈 Possíveis Melhorias Futuras
+## 📈 Possíveis Melhorias Futuras Além das já citadas
 
 Envio real de e-mails (SMTP ou serviço externo)
 
