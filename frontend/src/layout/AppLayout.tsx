@@ -1,58 +1,45 @@
-import type { ReactNode } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { clearToken } from "../api/authToken";
 
-type Props = { children: ReactNode };
+export default function AppLayout() {
+  const navigate = useNavigate();
 
-export default function AppLayout({ children }: Props) {
+  function onLogout() {
+    clearToken();
+    navigate("/login", { replace: true });
+  }
+
   return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 p-4 md:grid-cols-[240px_1fr]">
-        <aside className="rounded-xl border bg-background p-4">
-          <Link to="/" className="block text-lg font-semibold">
+    <div>
+      <header style={{ padding: 16, borderBottom: "1px solid #e6e6e6" }}>
+        <nav style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <Link to="/app" style={{ fontWeight: 700 }}>
             Member Get Member
           </Link>
 
-          <Separator className="my-4" />
+          <Link to="/app/members">Members</Link>
+          <Link to="/app/referrals">Referrals</Link>
+          <Link to="/app/ranking">Ranking</Link>
 
-          <nav className="flex flex-col gap-1">
-            <NavLink
-              to="/members"
-              className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm ${
-                  isActive ? "bg-muted font-medium" : "hover:bg-muted/60"
-                }`
-              }
-            >
-              Members
-            </NavLink>
+          <div style={{ flex: 1 }} />
 
-            <NavLink
-              to="/ranking"
-              className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm ${
-                  isActive ? "bg-muted font-medium" : "hover:bg-muted/60"
-                }`
-              }
-            >
-              Ranking
-            </NavLink>
+          <button
+            onClick={onLogout}
+            style={{
+              padding: "8px 12px",
+              borderRadius: 10,
+              border: "1px solid #ddd",
+              cursor: "pointer",
+            }}
+          >
+            Sair
+          </button>
+        </nav>
+      </header>
 
-            <NavLink
-              to="/referrals"
-              className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm ${
-                  isActive ? "bg-muted font-medium" : "hover:bg-muted/60"
-                }`
-              }
-            >
-              Referrals
-            </NavLink>
-          </nav>
-        </aside>
-
-        <main className="rounded-xl border bg-background p-4">{children}</main>
-      </div>
+      <main style={{ padding: 16 }}>
+        <Outlet />
+      </main>
     </div>
   );
 }

@@ -1,12 +1,33 @@
-import { api } from "./http";
-import type { Member } from "../types/Member";
+import { apiFetch } from "./http";
 
-export async function getMembers(): Promise<Member[]> {
-  const response = await api.get<Member[]>("/members");
-  return response.data;
+export type MemberDTO = {
+  id: number;
+  name: string;
+  email: string;
+  referralCode: string;
+  credits: number;
+};
+
+export type RankingRowDTO = {
+  id: number;
+  name: string;
+  email: string;
+  referralCode: string;
+  credits: number;
+};
+
+export function getMembers(): Promise<MemberDTO[]> {
+  return apiFetch<MemberDTO[]>("/members");
 }
 
-export async function getRanking(): Promise<Member[]> {
-  const response = await api.get<Member[]>("/members/ranking");
-  return response.data;
+export function getRanking(): Promise<RankingRowDTO[]> {
+
+  return apiFetch<RankingRowDTO[]>("/members/ranking");
+
+  
 }
+
+export function getMe(): Promise<MemberDTO> {
+  return apiFetch<MemberDTO>("/members/me");
+}
+

@@ -1,18 +1,35 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
 import AppLayout from "./layout/AppLayout";
+import Dashboard from "./pages/Dashboard";
 import MembersList from "./pages/MembersList";
-import Ranking from "./pages/Ranking";
 import Referrals from "./pages/Referrals";
+import Ranking from "./pages/Ranking";
 
 export default function App() {
   return (
-    <AppLayout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/members" replace />} />
-        <Route path="/members" element={<MembersList />} />
-        <Route path="/ranking" element={<Ranking />} />
-        <Route path="/referrals" element={<Referrals />} />
-      </Routes>
-    </AppLayout>
+    <Routes>
+      {/* público */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* protegido */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/app" element={<AppLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="members" element={<MembersList />} />
+          <Route path="referrals" element={<Referrals />} />
+          <Route path="ranking" element={<Ranking />} />
+        </Route>
+      </Route>
+
+      {/* fallback */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
