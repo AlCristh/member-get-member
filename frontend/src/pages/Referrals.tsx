@@ -34,7 +34,6 @@ export default function Referrals() {
   }, []);
 
   const ordered = useMemo(() => {
-    // CADASTRADO primeiro, depois CONVIDADO, e mais recente no topo
     return [...items].sort((a, b) => {
       if (a.status !== b.status) return a.status === "CADASTRADO" ? -1 : 1;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -68,125 +67,122 @@ export default function Referrals() {
     }
   }
 
-  if (state === "loading") return <div>Carregando indicações...</div>;
-  if (state === "error") return <div>{error}</div>;
+  if (state === "loading")
+    return <div className="text-gray-600">Carregando indicações...</div>;
+  if (state === "error") return <div className="text-red-600">{error}</div>;
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2 style={{ marginTop: 0 }}>Indicações</h2>
+    <div className="space-y-5">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-xl font-semibold">Indicações</h2>
+        <p className="text-sm text-gray-500">
+          Convide por e-mail, acompanhe status e reenvie quando necessário.
+        </p>
+      </div>
 
-      {/* criar convite */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          margin: "12px 0",
-        }}
-      >
-        <input
-          value={inviteEmail}
-          onChange={(e) => setInviteEmail(e.target.value)}
-          placeholder="Email do convidado (ex: pessoa@email.com)"
-          style={{
-            padding: "8px 10px",
-            borderRadius: 10,
-            border: "1px solid #ddd",
-            width: 360,
-            maxWidth: "100%",
-          }}
-        />
-        <button
-          onClick={onInvite}
-          disabled={inviteLoading}
-          style={{
-            padding: "8px 12px",
-            borderRadius: 10,
-            border: "1px solid #ddd",
-            cursor: "pointer",
-          }}
-        >
-          {inviteLoading ? "Convidando..." : "Convidar"}
-        </button>
+      <div className="rounded-2xl border p-4 bg-gray-50">
+        <div className="flex flex-col md:flex-row gap-2 md:items-center">
+          <input
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            placeholder="Email do convidado (ex: pessoa@email.com)"
+            className="w-full md:max-w-md rounded-xl border px-3 py-2 bg-white text-sm"
+          />
+          <button
+            onClick={onInvite}
+            disabled={inviteLoading}
+            className="px-4 py-2 rounded-xl bg-black text-white hover:opacity-90 disabled:opacity-60 text-sm"
+          >
+            {inviteLoading ? "Convidando..." : "Convidar"}
+          </button>
+        </div>
       </div>
 
       {ordered.length === 0 ? (
-        <p>Nenhuma indicação ainda.</p>
+        <p className="text-gray-600">Nenhuma indicação ainda.</p>
       ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={th}>ID</th>
-                <th style={th}>Convidado</th>
-                <th style={th}>Status</th>
-                <th style={th}>Data convite</th>
-                <th style={th}>Data cadastro</th>
-                <th style={th}>Reenvios</th>
-                <th style={th}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ordered.map((r) => {
-                const who =
-                  r.referredEmail ??
-                  r.invitedEmail ??
-                  (r.referredId ? `Member #${r.referredId}` : "-");
+        <div className="rounded-2xl border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr className="text-left">
+                  <th className="px-4 py-3 font-semibold text-gray-700">ID</th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Convidado
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Data convite
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Data cadastro
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Reenvios
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {ordered.map((r) => {
+                  const who =
+                    r.referredEmail ??
+                    r.invitedEmail ??
+                    (r.referredId ? `Member #${r.referredId}` : "-");
 
-                return (
-                  <tr key={r.id}>
-                    <td style={td}>{r.id}</td>
-                    <td style={td}>{who}</td>
-                    <td style={td}>{r.status}</td>
-                    <td style={td}>
-                      {r.invitedAt
-                        ? new Date(r.invitedAt).toLocaleString()
-                        : "-"}
-                    </td>
-                    <td style={td}>
-                      {r.registeredAt
-                        ? new Date(r.registeredAt).toLocaleString()
-                        : "-"}
-                    </td>
-                    <td style={td}>{r.resendCount ?? 0}</td>
-                    <td style={td}>
-                      {r.status === "CONVIDADO" ? (
-                        <button
-                          onClick={() => onResend(r.id)}
-                          style={{
-                            padding: "6px 10px",
-                            borderRadius: 10,
-                            border: "1px solid #ddd",
-                            cursor: "pointer",
-                          }}
+                  const badge =
+                    r.status === "CADASTRADO"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : "bg-yellow-50 text-yellow-800 border-yellow-200";
+
+                  return (
+                    <tr key={r.id} className="border-b last:border-b-0">
+                      <td className="px-4 py-3 text-gray-700">{r.id}</td>
+                      <td className="px-4 py-3 text-gray-900">{who}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-lg border ${badge}`}
                         >
-                          Reenviar
-                        </button>
-                      ) : (
-                        <span style={{ color: "#666" }}>—</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                          {r.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {r.invitedAt
+                          ? new Date(r.invitedAt).toLocaleString()
+                          : "-"}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {r.registeredAt
+                          ? new Date(r.registeredAt).toLocaleString()
+                          : "-"}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {r.resendCount ?? 0}
+                      </td>
+                      <td className="px-4 py-3">
+                        {r.status === "CONVIDADO" ? (
+                          <button
+                            onClick={() => onResend(r.id)}
+                            className="px-3 py-2 rounded-xl border bg-white hover:bg-gray-50 text-sm"
+                          >
+                            Reenviar
+                          </button>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
   );
 }
-
-const th: React.CSSProperties = {
-  textAlign: "left",
-  padding: "10px 8px",
-  borderBottom: "1px solid #e6e6e6",
-  fontWeight: 600,
-  whiteSpace: "nowrap",
-};
-
-const td: React.CSSProperties = {
-  padding: "10px 8px",
-  borderBottom: "1px solid #f0f0f0",
-  whiteSpace: "nowrap",
-};

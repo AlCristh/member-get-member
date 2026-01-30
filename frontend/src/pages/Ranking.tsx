@@ -4,6 +4,25 @@ import type { Member } from "../types/Member";
 
 type LoadState = "idle" | "loading" | "success" | "error";
 
+function Medal({ pos }: { pos: number }) {
+  const label = pos === 1 ? "🥇" : pos === 2 ? "🥈" : "🥉";
+  const bg =
+    pos === 1
+      ? "bg-yellow-50 border-yellow-200 text-yellow-800"
+      : pos === 2
+        ? "bg-gray-50 border-gray-200 text-gray-700"
+        : "bg-orange-50 border-orange-200 text-orange-800";
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border ${bg}`}
+    >
+      <span>{label}</span>
+      <span className="font-semibold">Top {pos}</span>
+    </span>
+  );
+}
+
 export default function Ranking() {
   const [state, setState] = useState<LoadState>("idle");
   const [members, setMembers] = useState<Member[]>([]);
@@ -56,110 +75,114 @@ export default function Ranking() {
   );
 
   return (
-    <div style={{ padding: 16 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          marginBottom: 12,
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Ranking</h2>
-
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar por nome, email ou código..."
-          style={{
-            padding: "8px 10px",
-            borderRadius: 8,
-            border: "1px solid #ddd",
-            width: 320,
-            maxWidth: "100%",
-          }}
-        />
+    <div className="space-y-5">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-xl font-semibold">Ranking</h2>
+        <p className="text-sm text-gray-500">
+          Ordenado por créditos (maior primeiro). Empates seguem a regra do
+          backend.
+        </p>
       </div>
 
-      {state === "loading" && <p>Carregando ranking...</p>}
+      <div className="rounded-2xl border p-4 bg-gray-50">
+        <div className="flex flex-col md:flex-row gap-2 md:items-center">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar por nome, email ou código..."
+            className="w-full md:max-w-md rounded-xl border px-3 py-2 bg-white text-sm"
+          />
+
+          <div className="text-sm text-gray-600 md:ml-auto">
+            {state === "success" ? (
+              <span>
+                Mostrando <b>{filtered.length}</b> de <b>{members.length}</b>
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {state === "loading" && (
+        <p className="text-gray-600">Carregando ranking...</p>
+      )}
 
       {state === "error" && (
-        <div
-          style={{ padding: 12, border: "1px solid #f3c0c0", borderRadius: 8 }}
-        >
-          <p style={{ margin: 0 }}>{errorMessage}</p>
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+          <p className="m-0 text-red-700">{errorMessage}</p>
         </div>
       )}
 
       {state === "success" && filtered.length === 0 && (
-        <p>Nenhum membro encontrado.</p>
+        <p className="text-gray-600">Nenhum membro encontrado.</p>
       )}
 
       {state === "success" && filtered.length > 0 && (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={th}>#</th>
-                <th style={th}>Nome</th>
-                <th style={th}>Email</th>
-                <th style={th}>Código</th>
-                <th style={th}>Créditos</th>
-              </tr>
-            </thead>
+        <div className="rounded-2xl border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr className="text-left">
+                  <th className="px-4 py-3 font-semibold text-gray-700">#</th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Nome
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Código
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700 text-right">
+                    Créditos
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-gray-700">
+                    Destaque
+                  </th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {filtered.map((m, index) => {
-                const isTop3 = top3Ids.has(m.id);
-                return (
-                  <tr
-                    key={m.id}
-                    style={{
-                      background: isTop3 ? "#fff7d6" : "transparent",
-                    }}
-                  >
-                    <td style={td}>{index + 1}</td>
-                    <td style={tdStrong}>{m.name}</td>
-                    <td style={td}>{m.email}</td>
-                    <td style={tdMono}>{m.referralCode}</td>
-                    <td style={tdRight}>{m.credits ?? 0}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+              <tbody>
+                {filtered.map((m, index) => {
+                  const pos = index + 1;
+                  const isTop3 = top3Ids.has(m.id);
+
+                  return (
+                    <tr
+                      key={m.id}
+                      className={[
+                        "border-b last:border-b-0",
+                        isTop3 ? "bg-yellow-50/40" : "",
+                      ].join(" ")}
+                    >
+                      <td className="px-4 py-3 text-gray-700">{pos}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">
+                        {m.name}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">{m.email}</td>
+                      <td className="px-4 py-3">
+                        <code className="px-2 py-1 rounded-lg border bg-white font-mono text-xs">
+                          {m.referralCode}
+                        </code>
+                      </td>
+                      <td className="px-4 py-3 text-right font-semibold text-gray-900">
+                        {m.credits ?? 0}
+                      </td>
+                      <td className="px-4 py-3">
+                        {pos <= 3 ? (
+                          <Medal pos={pos} />
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
   );
 }
-
-const th: React.CSSProperties = {
-  textAlign: "left",
-  padding: "10px 8px",
-  borderBottom: "1px solid #e6e6e6",
-  fontWeight: 600,
-  whiteSpace: "nowrap",
-};
-
-const td: React.CSSProperties = {
-  padding: "10px 8px",
-  borderBottom: "1px solid #f0f0f0",
-  whiteSpace: "nowrap",
-};
-
-const tdRight: React.CSSProperties = {
-  ...td,
-  textAlign: "right",
-};
-
-const tdStrong: React.CSSProperties = {
-  ...td,
-  fontWeight: 600,
-};
-
-const tdMono: React.CSSProperties = {
-  ...td,
-  fontFamily:
-    "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-};
