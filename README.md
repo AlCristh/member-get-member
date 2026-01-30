@@ -1,254 +1,249 @@
-Member Get Member – Backend API
+📌 Member Get Member
 
-API REST desenvolvida em Java 17 + Spring Boot para gerenciar um programa de indicação (Member Get Member), onde usuários podem se cadastrar, indicar outros usuários e acumular créditos com base nas indicações.
+Sistema completo de indicação de usuários (Member Get Member), onde cada usuário pode convidar outras pessoas, acompanhar o status das indicações e receber créditos quando uma indicação se converte em cadastro.
 
-Este projeto foi desenvolvido como case técnico Fullstack, com foco inicial no backend, seguindo boas práticas de arquitetura, validação, segurança e organização de código.
+O projeto foi desenvolvido como case técnico, com foco em clareza de regras de negócio, organização de código e funcionamento ponta a ponta.
 
-🚀 Tecnologias Utilizadas
+🚀 Funcionalidades
+Autenticação e Usuários
+
+Cadastro de usuários com nome, e-mail e senha
+
+Login com autenticação via JWT
+
+Cada usuário recebe automaticamente:
+
+um código de indicação único
+
+um link de indicação
+
+Indicações
+
+Cadastro de novos usuários via:
+
+código de indicação
+
+link de indicação
+
+Convite de pessoas por e-mail
+
+Controle de status da indicação:
+
+CONVIDADO → convite enviado, ainda não cadastrado
+
+CADASTRADO → convite convertido em cadastro
+
+Reenvio de convites para contatos ainda não cadastrados
+
+Controle de:
+
+data do convite
+
+data do cadastro
+
+quantidade de reenvios
+
+data do último reenvio
+
+Créditos
+
+Crédito automático para o usuário que indicou
+
+Cada conversão gera apenas um crédito
+
+O sistema impede crédito duplicado para o mesmo indicado
+
+Dashboard
+
+Exibe:
+
+código de indicação
+
+link de indicação
+
+saldo de créditos
+
+Tela de gestão de indicações com ações de reenvio
+
+🧠 Regras de Negócio
+
+❌ Autoindicação não é permitida
+
+Um usuário não pode se indicar nem via código, nem via convite por e-mail
+
+❌ Crédito duplicado não é permitido
+
+Cada indicação pode gerar crédito apenas uma vez
+
+✅ Código de indicação é único
+
+✅ Indicações podem existir antes do cadastro
+
+Convites por e-mail criam uma indicação CONVIDADO
+
+Quando o usuário se cadastra com o mesmo e-mail, a indicação é convertida para CADASTRADO
+
+✅ O sistema registra todas as datas importantes
+
+convite
+
+cadastro
+
+crédito
+
+reenvios
+
+🏗️ Arquitetura e Decisões Técnicas
+Modelagem de Indicação (Referral)
+
+A entidade Referral foi modelada para suportar dois fluxos:
+
+Convite por e-mail (antes do cadastro)
+
+Cadastro direto via código de indicação
+
+Por isso:
+
+referred pode ser null (convite antes do cadastro)
+
+invitedEmail é usado para associar o convite ao cadastro futuro
+
+Campos como creditedAt garantem idempotência (sem crédito duplicado)
+
+Conversão de Convite
+
+Quando um usuário se cadastra:
+
+Se existir um convite CONVIDADO para aquele e-mail:
+
+o convite é convertido para CADASTRADO
+
+o crédito é aplicado
+
+Caso contrário:
+
+é criado um Referral direto como CADASTRADO
+
+🛠️ Tecnologias Utilizadas
+Back-end
 
 Java 17
 
-Spring Boot 4
+Spring Boot
 
-Spring Web
+Spring Security (JWT)
 
 Spring Data JPA
-
-Spring Security (API stateless)
 
 PostgreSQL
 
 Hibernate
 
-Lombok
+Front-end
 
-Maven
+React
 
-📐 Arquitetura
+React Router
 
-O projeto segue uma arquitetura em camadas:
+Fetch API
 
-api
- ├── controller
- ├── dto
- └── mapper
-domain
- ├── entity
- └── enums
-repository
-service
- ├── interface
- └── impl
-config
+Vite
 
-Camadas:
+▶️ Como Rodar o Projeto
+Pré-requisitos
 
-Controller: expõe os endpoints REST
+Java 17+
 
-Service: regras de negócio
-
-Repository: acesso a dados via JPA
-
-DTOs: objetos de entrada e saída
-
-Mapper: conversão entre entidade ↔ DTO
-
-🔐 Segurança
-
-API configurada como STATELESS
-
-CSRF desabilitado (API REST)
-
-Form login e HTTP Basic desativados
-
-Endpoints liberados explicitamente via SecurityConfig
-
-Preparada para futura autenticação via JWT no frontend
-
-⚠️ Este backend não serve páginas HTML.
-Toda interação é feita via endpoints REST (Postman/Thunder/Frontend).
-
-❤️ Health Check
-
-Verificação simples de status da API:
-
-GET /health
-
-
-Resposta:
-
-OK!!
-
-🧩 Entidades Principais
-Member
-
-Representa um usuário do sistema.
-
-Campos principais:
-
-id
-
-name
-
-email
-
-referralCode (gerado automaticamente)
-
-referredByCode
-
-credits
-
-createdAt
-
-Referral
-
-Representa uma indicação entre membros.
-
-Campos principais:
-
-id
-
-referrer
-
-referred
-
-status (ENUM)
-
-createdAt
-
-Status possíveis:
-
-CADASTRADO
-
-(pronto para evolução futura)
-
-📌 Regras de Negócio Implementadas
-
-✅ Não permite cadastro de membros com e-mail duplicado
-
-✅ Código de indicação é gerado automaticamente
-
-✅ Um membro não pode se autoindicar
-
-✅ Um membro só pode ser indicado uma única vez
-
-✅ Valida código de indicação inexistente
-
-✅ Retorno de erros padronizado em JSON
-
-✅ Ranking de membros por créditos
-
-✅ Ordenação estável no ranking
-
-🔗 Endpoints Disponíveis
-Members
-Criar membro
-POST /api/members
-
-
-Body (JSON):
-
-{
-  "name": "João Silva",
-  "email": "joao@email.com",
-  "referredByCode": "ABC12345"
-}
-
-Listar membros
-GET /api/members
-
-Ranking de membros
-GET /api/members/ranking
-
-
-Ordenado por:
-
-credits (DESC)
-
-createdAt (ASC)
-
-Referrals
-Criar indicação
-POST /api/referrals
-
-
-Body (JSON):
-
-{
-  "referralCode": "ABC12345",
-  "referredMemberId": 2
-}
-
-Listar indicações
-GET /api/referrals
-
-⚠️ Tratamento de Erros
-
-Erros retornam sempre em formato JSON, com status HTTP adequado.
-
-Exemplo:
-
-{
-  "message": "E-mail já cadastrado"
-}
-
-🗄️ Banco de Dados
+Node.js 18+
 
 PostgreSQL
 
-Configuração via application.properties
+Banco de Dados
 
-Hibernate gerencia criação das tabelas automaticamente
+Crie o banco no PostgreSQL:
 
-Exemplo:
+CREATE DATABASE membergetmember;
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/membergetmember
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-spring.jpa.hibernate.ddl-auto=update
+## Execução do backend
 
-▶️ Como Executar o Projeto
-Pré-requisitos:
+O backend utiliza variáveis de ambiente para dados sensíveis.
 
-Java 17
+abra o Windows / PowerShell na pasta do projeto :
 
-Maven
+digite:
+cd backend
+$env:DB_USER="postgres"
+$env:DB_PASSWORD="Zerokun10@A"
+$env:JWT_SECRET="member-get-member-jwt-secret-2026"
 
-PostgreSQL rodando
-
-Passos:
-git clone https://github.com/AlCristh/member-get-member.git
-cd member-get-member/backend
-mvn spring-boot:run
+.\mvnw spring-boot:run ENTER
 
 
-API disponível em:
+A API ficará disponível em:
 
 http://localhost:8080
 
-🧪 Testes
+Front-end
 
-Os endpoints podem ser testados via:
+Na pasta frontend:
 
-Thunder Client
+npm install
+npm run dev
 
-Postman
 
-Insomnia
+A aplicação ficará disponível em:
 
-🧭 Próximos Passos (Planejado)
+http://localhost:5173
 
-🔜 Frontend em React
+🔐 Autenticação
 
-🔜 Integração via Axios
+A autenticação é feita via JWT
 
-🔜 Autenticação com JWT
+O token é retornado no login e armazenado no front
 
-🔜 UI para ranking e indicações
+Todas as rotas protegidas exigem o header:
 
-🔜 Validações adicionais no frontend
+Authorization: Bearer <token>
 
-👤 Autor
+📡 Endpoints Principais
+Autenticação
 
-Desenvolvido por Alejandro Magalhães
-Projeto criado como case técnico Fullstack Júnior
+POST /api/auth/register
+
+POST /api/auth/login
+
+Indicações
+
+POST /api/referrals/invite → convite por e-mail
+
+POST /api/referrals/{id}/resend → reenvio de convite
+
+GET /api/referrals/my → indicações do usuário logado
+
+📈 Possíveis Melhorias Futuras
+
+Envio real de e-mails (SMTP ou serviço externo)
+
+Limite de reenvios por convite
+
+Histórico de ações por indicação
+
+Paginação e filtros na listagem de indicações
+
+Papéis de usuário (ex: ADMIN)
+
+Expiração de convites antigos
+
+Testes automatizados (unitários e integração)
+
+📌 Considerações Finais
+
+Este projeto foi desenvolvido com foco em:
+
+clareza de regras de negócio
+
+organização e legibilidade do código
+
+funcionamento completo ponta a ponta
+
+modelagem flexível para evolução futura
