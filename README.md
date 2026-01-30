@@ -130,7 +130,7 @@ Caso contrário:
 ![mermaid diagram](https://github.com/user-attachments/assets/58b421c6-1613-4730-a006-009938d419de)
 
 
-Visão Geral da Arquitetura
+## Visão Geral da Arquitetura
 
 A aplicação segue uma arquitetura Full Stack desacoplada, separando claramente responsabilidades entre Frontend, Backend e Persistência, com autenticação baseada em JWT.
 
