@@ -125,7 +125,7 @@ Caso contrário:
 
 é criado um Referral direto como CADASTRADO
 
-## Mermaid  Diagram
+## Diagram
 
 ![mermaid diagram](https://github.com/user-attachments/assets/58b421c6-1613-4730-a006-009938d419de)
 
