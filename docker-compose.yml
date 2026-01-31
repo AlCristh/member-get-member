@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16
+    container_name: mgm-db
+    environment:
+      POSTGRES_DB: membergetmember
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - mgm_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d membergetmember"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mgm-backend
+    environment:
+      # DB
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: membergetmember
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+      # JWT (>= 32 caracteres!)
+      JWT_SECRET: "member-get-member-super-secure-jwt-secret-2026-strong"
+      JWT_EXPIRATION_MINUTES: 60
+
+      # opcional: garantir ddl-auto (se você já não setou no properties)
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mgm_db_data:
