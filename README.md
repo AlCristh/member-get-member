@@ -261,55 +261,34 @@ Fetch API
 
 Vite
 
-## ▶️ Como Rodar o Projeto
+
+## 🐳 Execução Completa com Docker (Frontend + Backend + Banco)
+
+Este projeto pode ser executado integralmente via Docker Compose, subindo automaticamente:
+
+Frontend (React + Vite + Nginx)
+
+Backend (Spring Boot)
+
+Banco de Dados (PostgreSQL)
+
 Pré-requisitos
 
-Java 17+
+Docker
 
-Node.js 18+
+Docker Compose
 
-PostgreSQL
+▶️ Como executar tudo
 
-Banco de Dados
+Na raiz do projeto:
 
-Crie o banco no PostgreSQL:
+docker compose up --build
 
-CREATE DATABASE membergetmember;
+🌐 URLs da aplicação
 
-## Execução do backend
+Frontend: http://localhost:3000
 
-O backend utiliza variáveis de ambiente(locais) para dados sensíveis.
-
-abra o Windows / PowerShell na pasta do projeto :
-
-digite:
-
-cd backend
-
-$env:DB_USER="postgres"
-
-$env:DB_PASSWORD="sua senha aqui"
-
-$env:JWT_SECRET="member-get-member-jwt-secret-2026"
-
-.\mvnw spring-boot:run ENTER
-
-
-A API ficará disponível em:
-
-http://localhost:8080
-
-## Front-end
-
-Na pasta frontend:
-
-npm install
-npm run dev
-
-
-A aplicação ficará disponível em:
-
-http://localhost:5173
+Backend (API): http://localhost:8080
 
 ## 🔐 Autenticação
 
