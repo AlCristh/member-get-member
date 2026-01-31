@@ -1,10 +1,10 @@
-📌 Member Get Member
+## 📌 Member Get Member
 
 Sistema completo de indicação de usuários (Member Get Member), onde cada usuário pode convidar outras pessoas, acompanhar o status das indicações e receber créditos quando uma indicação se converte em cadastro.
 
 O projeto foi desenvolvido como case técnico, com foco em clareza de regras de negócio, organização de código e funcionamento ponta a ponta.
 
-🚀 Funcionalidades
+## 🚀 Funcionalidades
 Autenticação e Usuários
 
 Cadastro de usuários com nome, e-mail e senha
@@ -65,7 +65,7 @@ saldo de créditos
 
 Tela de gestão de indicações com ações de reenvio
 
-🧠 Regras de Negócio
+## 🧠 Regras de Negócio
 
 ❌ Autoindicação não é permitida
 
@@ -93,7 +93,8 @@ crédito
 
 reenvios
 
-🏗️ Arquitetura e Decisões Técnicas
+## 🏗️ Arquitetura e Decisões Técnicas
+
 Modelagem de Indicação (Referral)
 
 A entidade Referral foi modelada para suportar dois fluxos:
@@ -124,7 +125,118 @@ Caso contrário:
 
 é criado um Referral direto como CADASTRADO
 
-🛠️ Tecnologias Utilizadas
+## Diagram
+
+![mermaid diagram](https://github.com/user-attachments/assets/58b421c6-1613-4730-a006-009938d419de)
+
+
+## Visão Geral da Arquitetura
+
+A aplicação segue uma arquitetura Full Stack desacoplada, separando claramente responsabilidades entre Frontend, Backend e Persistência, com autenticação baseada em JWT.
+
+Frontend (React + Vite)
+
+O frontend é responsável apenas por experiência do usuário e orquestração de chamadas:
+
+Pages / Layouts: Login, Dashboard, Members, Referrals, Ranking
+
+API Client centralizado:
+
+Anexa automaticamente o JWT no header Authorization
+
+Centraliza tratamento de erros HTTP
+
+Session Storage:
+
+Token JWT armazenado apenas na sessão
+
+Evita login automático após fechar o navegador (boa prática de segurança)
+
+📌 Nenhuma regra de negócio crítica fica no frontend.
+
+🔐 Backend (Spring Boot)
+
+O backend segue uma arquitetura em camadas bem definidas:
+
+Controllers
+
+Exposição da API REST (/auth, /members, /referrals)
+
+Apenas valida request/response
+
+Não contém lógica de negócio
+
+Service Layer
+
+Onde vivem todas as regras de negócio
+
+Exemplos:
+
+Prevenção de autoindicação
+
+Crédito único por conversão
+
+Gestão de status (CONVIDADO → CADASTRADO)
+
+Reenvio de convites com contagem
+
+Security
+
+Spring Security + JWT
+
+Filtro intercepta requisições
+
+Extrai o e-mail do token
+
+Injeta o usuário autenticado no contexto
+
+Repositories
+
+JPA Repositories
+
+Comunicação exclusiva com o banco
+
+Nenhuma lógica de negócio aqui
+
+## Evolutiva
+
+![evolutiva ](https://github.com/user-attachments/assets/65f6a735-023d-4f9d-8809-a0a2e72def49)
+
+o sistema foi pensado para permitir evoluções futuras caso o volume de dados ou acessos cresça significativamente.
+
+Uso de Cache para Indicações Pendentes (Redis)
+
+Em um cenário de alta escala, as indicações por e-mail que ainda não se converteram em cadastro poderiam ser armazenadas temporariamente em um cache (Redis), utilizando TTL (Time To Live).
+
+Fluxo proposto:
+
+Convite enviado para um e-mail ainda não cadastrado
+
+Indicação armazenada como “pendente” no cache
+
+Ao realizar o cadastro:
+
+o sistema valida a existência do convite
+
+persiste a indicação no banco
+
+aplica o crédito ao indicador
+
+remove o registro do cache
+
+Benefícios dessa abordagem:
+
+Redução de dados não utilizados no banco
+
+Melhor performance para consultas de convites pendentes
+
+Expiração automática de convites não utilizados
+
+Preparação para cenários de alto volume de convites
+
+Essa evolução não foi implementada nesta versão por não ser necessária para o escopo do case, evitando complexidade prematura e mantendo a solução simples e robusta.
+
+## 🛠️ Tecnologias Utilizadas
 Back-end
 
 Java 17
@@ -149,7 +261,7 @@ Fetch API
 
 Vite
 
-▶️ Como Rodar o Projeto
+## ▶️ Como Rodar o Projeto
 Pré-requisitos
 
 Java 17+
@@ -171,9 +283,13 @@ O backend utiliza variáveis de ambiente(locais) para dados sensíveis.
 abra o Windows / PowerShell na pasta do projeto :
 
 digite:
+
 cd backend
+
 $env:DB_USER="postgres"
+
 $env:DB_PASSWORD="sua senha aqui"
+
 $env:JWT_SECRET="member-get-member-jwt-secret-2026"
 
 .\mvnw spring-boot:run ENTER
@@ -183,7 +299,7 @@ A API ficará disponível em:
 
 http://localhost:8080
 
-Front-end
+## Front-end
 
 Na pasta frontend:
 
@@ -195,7 +311,7 @@ A aplicação ficará disponível em:
 
 http://localhost:5173
 
-🔐 Autenticação
+## 🔐 Autenticação
 
 A autenticação é feita via JWT
 
@@ -205,7 +321,7 @@ Todas as rotas protegidas exigem o header:
 
 Authorization: Bearer <token>
 
-📡 Endpoints Principais
+## 📡 Endpoints Principais
 Autenticação
 
 POST /api/auth/register
@@ -220,7 +336,7 @@ POST /api/referrals/{id}/resend → reenvio de convite
 
 GET /api/referrals/my → indicações do usuário logado
 
-📈 Possíveis Melhorias Futuras
+## 📈 Possíveis Melhorias Futuras Além das já citadas
 
 Envio real de e-mails (SMTP ou serviço externo)
 
@@ -236,7 +352,7 @@ Expiração de convites antigos
 
 Testes automatizados (unitários e integração)
 
-📌 Considerações Finais
+## 📌 Considerações Finais
 
 Este projeto foi desenvolvido com foco em:
 
