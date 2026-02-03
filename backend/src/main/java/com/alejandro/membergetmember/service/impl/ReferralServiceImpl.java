@@ -61,8 +61,16 @@ public class ReferralServiceImpl implements ReferralService {
         Member referrer = memberRepository.findByEmail(referrerEmail)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        if (memberRepository.existsByEmail(invitedEmail)) {
+            throw new IllegalArgumentException("E-mail already registered");
+        }
+
         if (referrer.getEmail().equalsIgnoreCase(invitedEmail)) {
             throw new IllegalArgumentException("Self referral is not allowed");
+        }
+
+        if (referralRepository.existsByInvitedEmailIgnoreCaseAndStatus(invitedEmail, ReferralStatus.CONVIDADO)) {
+            throw new IllegalArgumentException("Invite already exists for this email");
         }
 
         if (referralRepository.existsByReferrerAndInvitedEmailIgnoreCaseAndStatus(referrer, invitedEmail,
@@ -103,6 +111,7 @@ public class ReferralServiceImpl implements ReferralService {
 
         return referralRepository.save(referral);
     }
+    
 
     @Override
     public List<ReferralResponse> findAll() {
@@ -131,4 +140,7 @@ public class ReferralServiceImpl implements ReferralService {
             throw new IllegalArgumentException("Email required");
         return s;
     }
+
+    
+    
 }

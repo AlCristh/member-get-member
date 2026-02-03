@@ -9,19 +9,27 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReferralRepository extends JpaRepository<Referral, Long> {
+        boolean existsByReferred(Member referred);
 
-    boolean existsByReferred(Member referred);
+        List<Referral> findAllByReferrer(Member referrer);
 
-    List<Referral> findAllByReferrer(Member referrer);
+        Optional<Referral> findFirstByReferrerAndInvitedEmailIgnoreCaseAndStatus(
+                        Member referrer,
+                        String invitedEmail,
+                        ReferralStatus status);
 
-    Optional<Referral> findFirstByReferrerAndInvitedEmailIgnoreCaseAndStatus(
-            Member referrer,
-            String invitedEmail,
-            ReferralStatus status);
+        boolean existsByReferrerAndInvitedEmailIgnoreCaseAndStatus(
+                        Member referrer,
+                        String invitedEmail,
+                        ReferralStatus status);
 
-  
-    boolean existsByReferrerAndInvitedEmailIgnoreCaseAndStatus(
-            Member referrer,
-            String invitedEmail,
-            ReferralStatus status);
+       
+        Optional<Referral> findFirstByInvitedEmailIgnoreCaseAndStatus(
+                        String invitedEmail,
+                        ReferralStatus status);
+                        
+                        
+                        boolean existsByInvitedEmailIgnoreCaseAndStatus(
+                        String invitedEmail,
+                        ReferralStatus status);
 }

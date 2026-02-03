@@ -44,11 +44,23 @@ public class AuthService {
         }
 
         String referredByCode = normalize(request.getReferredByCode());
-        Member referrer = null;
 
+        Member referrer = null;
+        Referral inviteFoundByEmail = null;
+
+        // 1) Se veio código, mantém seu fluxo atual
         if (referredByCode != null) {
             referrer = memberRepository.findByReferralCode(referredByCode)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid referral code"));
+        } else {
+            // 2) Se não veio código, tenta achar convite CONVIDADO por email
+            inviteFoundByEmail = referralRepository
+                    .findFirstByInvitedEmailIgnoreCaseAndStatus(request.getEmail(), ReferralStatus.CONVIDADO)
+                    .orElse(null);
+
+            if (inviteFoundByEmail != null) {
+                referrer = inviteFoundByEmail.getReferrer();
+            }
         }
 
         // cria usuário
@@ -64,18 +76,24 @@ public class AuthService {
 
         // aplica conversão (se houve indicação)
         if (referrer != null) {
-            // 🚫 autoindicação (aqui é só segurança extra)
+            // autoindicação (segurança extra)
             if (referrer.getId().equals(saved.getId())) {
                 throw new IllegalArgumentException("Self referral is not allowed");
             }
 
-            // 1) se já existia um convite CONVIDADO para esse email, converte ele
-            Referral invite = referralRepository
-                    .findFirstByReferrerAndInvitedEmailIgnoreCaseAndStatus(referrer, saved.getEmail(),
-                            ReferralStatus.CONVIDADO)
-                    .orElse(null);
-
             LocalDateTime now = LocalDateTime.now();
+
+            // Se achou convite por email (sem código), usa ele.
+            Referral invite = inviteFoundByEmail;
+
+            // Se não achou por email (caso do código), tenta achar o convite por email do
+            // referrer
+            if (invite == null) {
+                invite = referralRepository
+                        .findFirstByReferrerAndInvitedEmailIgnoreCaseAndStatus(
+                                referrer, saved.getEmail(), ReferralStatus.CONVIDADO)
+                        .orElse(null);
+            }
 
             if (invite != null) {
                 invite.setReferred(saved);
@@ -92,13 +110,13 @@ public class AuthService {
 
                 referralRepository.save(invite);
             } else {
-                // 2) se não existia convite, cria um referral direto CADASTRADO
-                // 🚫 impede duplicado por referred (regra do case)
+                // fallback: se não existia convite, cria referral direto CADASTRADO
+                // impede duplicado por referred (regra do case)
                 if (!referralRepository.existsByReferred(saved)) {
                     Referral referral = new Referral();
                     referral.setReferrer(referrer);
                     referral.setReferred(saved);
-                    referral.setInvitedEmail(saved.getEmail()); // opcional, mas ajuda
+                    referral.setInvitedEmail(saved.getEmail()); // opcional, ajuda rastrear
                     referral.setInvitedAt(now);
                     referral.setRegisteredAt(now);
                     referral.setCreditedAt(now);
@@ -118,18 +136,6 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
-    public AuthResponse login(LoginRequest request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
-
-        if (!passwordEncoder.matches(request.getPassword(), member.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid credentials");
-        }
-
-        String token = jwtService.generateToken(member.getEmail());
-        return new AuthResponse(token);
-    }
-
     private String generateReferralCode() {
         return UUID.randomUUID()
                 .toString()
@@ -144,4 +150,17 @@ public class AuthService {
         String v = value.trim();
         return v.isEmpty() ? null : v.toUpperCase();
     }
+
+    public AuthResponse login(LoginRequest request) {
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(request.getPassword(), member.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        String token = jwtService.generateToken(member.getEmail());
+        return new AuthResponse(token);
+    }
+
 }
