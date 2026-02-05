@@ -1,4 +1,4 @@
-## 📌 Member Get Member
+## 📌 Member Get Member(InviteFlow)
 
 Sistema completo de indicação de usuários (Member Get Member), onde cada usuário pode convidar outras pessoas, acompanhar o status das indicações e receber créditos quando uma indicação se converte em cadastro.
 
